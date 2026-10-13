@@ -465,6 +465,15 @@ textarea:focus {
   font-weight: 600;
 }
 
+.progress-summary {
+  display: none;
+  margin: -6px 0 18px;
+  color: var(--mark);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .application-card-heading {
   display: flex;
   align-items: flex-start;
@@ -911,11 +920,15 @@ textarea:focus {
   .activity-notes-field {
     grid-column: 1 / -1;
   }
+}
 
-  .progress-tracker {
-    grid-template-columns: repeat(6, minmax(92px, 1fr));
-    overflow-x: auto;
-    scrollbar-width: thin;
+@media (max-width: 560px) {
+  .progress-label {
+    display: none;
+  }
+
+  .progress-summary {
+    display: block;
   }
 }
 
@@ -943,7 +956,14 @@ textarea:focus {
 
   .filter-control {
     width: 100%;
-    justify-content: space-between;
+  }
+
+  .filter-control select {
+    flex: 1;
+  }
+
+  .application-controls {
+    grid-template-columns: 1fr;
   }
 
   .activity-form {

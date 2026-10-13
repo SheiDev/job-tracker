@@ -129,6 +129,13 @@ function Application({ application, copy, onUpdate, onDelete }) {
         })}
       </ol>
 
+      {!isClosed && (
+        <p className="progress-summary">
+          {copy.stages[application.stage]} · {stageIndex + 1} {copy.of}{' '}
+          {APPLICATION_STAGES.length}
+        </p>
+      )}
+
       <div className="application-controls">
         <label>
           {copy.currentStage}
