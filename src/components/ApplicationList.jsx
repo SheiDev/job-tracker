@@ -1,58 +1,80 @@
-import { FilterIcon } from './Icons.jsx'
+import { useState } from 'react'
 import Application from './Application.jsx'
+import { FilterIcon } from './Icons.jsx'
 
-function ApplicationList({
-  copy,
-  applications,
-  visibleApplications,
-  filter,
-  importStatus,
-  editingId,
-  editDraft,
-  editingActivityId,
-  activityDraft,
-  openHistory,
-  onFilterChange,
-  onImport,
-  onExport,
-  onEditDraftChange,
-  onActivityDraftChange,
-  onStartEditing,
-  onCancelEditing,
-  onSaveEdits,
-  onStartEditingActivity,
-  onCancelEditingActivity,
-  onSaveActivityEdits,
-  onUpdate,
-  onToggleClosed,
-  onDelete,
-  onToggleHistory,
-  onAddActivity,
-}) {
+function ApplicationList({ copy, applications, onUpdate, onDelete }) {
+  const [filter, setFilter] = useState('all')
+
+  const visibleApplications = applications.filter((application) => {
+    if (filter === 'active') return !application.outcome
+    if (filter === 'closed') return application.outcome
+    return true
+  })
+
+  function downloadCsv() {
+    const rows = [
+      [
+        copy.company,
+        copy.role,
+        copy.applicationLink,
+        copy.currentStage,
+        copy.outcome,
+        copy.activityType,
+        copy.date,
+        copy.notes,
+        copy.followUp,
+      ],
+    ]
+
+    applications.forEach((application) => {
+      const info = [
+        application.company,
+        application.role,
+        application.link,
+        copy.stages[application.stage],
+        application.outcome
+          ? copy.outcomes[application.outcome]
+          : copy.inProgress,
+      ]
+
+      if (application.activities.length === 0) rows.push(info)
+
+      application.activities.forEach((activity) => {
+        rows.push([
+          ...info,
+          copy.activityTypes[activity.type],
+          activity.date,
+          activity.notes,
+          activity.followUpDate,
+        ])
+      })
+    })
+
+    const csv = rows
+      .map((row) =>
+        row.map((cell) => `"${String(cell || '').replaceAll('"', '""')}"`).join(',')
+      )
+      .join('\n')
+    // El \uFEFF hace que Excel lea bien los acentos
+    const file = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(file)
+    link.download = 'applications.csv'
+    link.click()
+  }
+
   return (
     <section className="applications-section">
       <div className="applications-heading">
-        <div>
-          <h2>
-            {copy.pipeline}{' '}
-            <span className="count-pill">{visibleApplications.length}</span>
-          </h2>
-        </div>
+        <h2>
+          {copy.pipeline}{' '}
+          <span className="count-pill">{visibleApplications.length}</span>
+        </h2>
         <div className="applications-tools">
-          <label className="button button-secondary export-button import-button">
-            {copy.importCsv}
-            <input
-              className="import-file-input"
-              type="file"
-              accept=".csv,text/csv"
-              onChange={onImport}
-              aria-label={copy.importCsv}
-            />
-          </label>
           <button
             className="button button-secondary export-button"
             type="button"
-            onClick={onExport}
+            onClick={downloadCsv}
             disabled={applications.length === 0}
           >
             {copy.exportCsv}
@@ -62,8 +84,7 @@ function ApplicationList({
             <span>{copy.show}</span>
             <select
               value={filter}
-              onChange={onFilterChange}
-              aria-label={copy.filterApplications}
+              onChange={(event) => setFilter(event.target.value)}
             >
               <option value="all">{copy.allApplications}</option>
               <option value="active">{copy.inProgress}</option>
@@ -72,11 +93,6 @@ function ApplicationList({
           </label>
         </div>
       </div>
-      {importStatus && (
-        <p className="import-status" role="status">
-          {importStatus}
-        </p>
-      )}
 
       {visibleApplications.length === 0 ? (
         <div className="empty-state">
@@ -96,24 +112,8 @@ function ApplicationList({
               key={application.id}
               application={application}
               copy={copy}
-              editingId={editingId}
-              editDraft={editDraft}
-              editingActivityId={editingActivityId}
-              activityDraft={activityDraft}
-              historyOpen={Boolean(openHistory[application.id])}
-              onEditDraftChange={onEditDraftChange}
-              onActivityDraftChange={onActivityDraftChange}
-              onStartEditing={onStartEditing}
-              onCancelEditing={onCancelEditing}
-              onSaveEdits={onSaveEdits}
-              onStartEditingActivity={onStartEditingActivity}
-              onCancelEditingActivity={onCancelEditingActivity}
-              onSaveActivityEdits={onSaveActivityEdits}
               onUpdate={onUpdate}
-              onToggleClosed={onToggleClosed}
               onDelete={onDelete}
-              onToggleHistory={onToggleHistory}
-              onAddActivity={onAddActivity}
             />
           ))}
         </div>

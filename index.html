@@ -11,25 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slate</title>
     <script>
-      try {
-        const savedTheme = localStorage.getItem('theme')
-        const theme =
-          savedTheme === 'dark' || savedTheme === 'light'
-            ? savedTheme
-            : matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light'
-        document.documentElement.dataset.theme = theme
-
-        const savedLanguage = localStorage.getItem('language')
-        const language =
-          savedLanguage === 'es' || savedLanguage === 'en'
-            ? savedLanguage
-            : navigator.language.startsWith('es')
-              ? 'es'
-              : 'en'
-        document.documentElement.lang = language
-      } catch {}
+      document.documentElement.dataset.theme =
+        localStorage.getItem('theme') || 'light'
     </script>
   </head>
   <body>

@@ -1,62 +1,74 @@
-import {
-  ACTIVITY_TYPES,
-  APPLICATION_STAGES,
-  OUTCOMES,
-} from '../i18n.js'
+import { useState } from 'react'
+import { APPLICATION_STAGES, OUTCOMES } from '../i18n.js'
+import ActivityForm from './ActivityForm.jsx'
 import { CheckIcon, TrashIcon } from './Icons.jsx'
 
-function Application({
-  application,
-  copy,
-  editingId,
-  editDraft,
-  editingActivityId,
-  activityDraft,
-  historyOpen,
-  onEditDraftChange,
-  onActivityDraftChange,
-  onStartEditing,
-  onCancelEditing,
-  onSaveEdits,
-  onStartEditingActivity,
-  onCancelEditingActivity,
-  onSaveActivityEdits,
-  onUpdate,
-  onToggleClosed,
-  onDelete,
-  onToggleHistory,
-  onAddActivity,
-}) {
-  const currentStageIndex = APPLICATION_STAGES.indexOf(application.stage)
+function Application({ application, copy, onUpdate, onDelete }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [company, setCompany] = useState(application.company)
+  const [role, setRole] = useState(application.role)
+  const [link, setLink] = useState(application.link)
+  const [showHistory, setShowHistory] = useState(false)
+  const [editingActivityId, setEditingActivityId] = useState(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
   const isClosed = Boolean(application.outcome)
-  const stageNumber = Math.max(currentStageIndex, 0) + 1
+  const stageIndex = APPLICATION_STAGES.indexOf(application.stage)
+
+  let cardClass = `application-card stage-${stageIndex + 1}`
+  if (isClosed) {
+    cardClass += ` is-closed outcome-${application.outcome.toLowerCase()}`
+  }
+
+  function startEditing() {
+    setCompany(application.company)
+    setRole(application.role)
+    setLink(application.link)
+    setIsEditing(true)
+  }
+
+  function saveEdits(event) {
+    event.preventDefault()
+    onUpdate(application.id, { company, role, link })
+    setIsEditing(false)
+  }
+
+  function toggleClosed() {
+    onUpdate(application.id, { outcome: isClosed ? null : 'Rejected' })
+  }
+
+  function addActivity(activity) {
+    onUpdate(application.id, {
+      activities: [{ ...activity, id: Date.now() }, ...application.activities],
+    })
+  }
+
+  function saveActivity(id, changes) {
+    onUpdate(application.id, {
+      activities: application.activities.map((activity) =>
+        activity.id === id ? { ...activity, ...changes } : activity
+      ),
+    })
+    setEditingActivityId(null)
+  }
 
   return (
-    <article
-      className={`application-card stage-${stageNumber}${isClosed ? ' is-closed' : ''}`}
-    >
-      {editingId === application.id ? (
-        <form
-          className="application-edit-form"
-          onSubmit={(event) => onSaveEdits(event, application.id)}
-        >
+    <article className={cardClass}>
+      {isEditing ? (
+        <form className="application-edit-form" onSubmit={saveEdits}>
           <label>
             {copy.company}
             <input
-              value={editDraft.company}
-              onChange={(event) =>
-                onEditDraftChange({ company: event.target.value })
-              }
+              value={company}
+              onChange={(event) => setCompany(event.target.value)}
               required
             />
           </label>
           <label>
             {copy.role}
             <input
-              value={editDraft.role}
-              onChange={(event) =>
-                onEditDraftChange({ role: event.target.value })
-              }
+              value={role}
+              onChange={(event) => setRole(event.target.value)}
               required
             />
           </label>
@@ -65,10 +77,8 @@ function Application({
             <span className="optional-label">{copy.optional}</span>
             <input
               type="url"
-              value={editDraft.link}
-              onChange={(event) =>
-                onEditDraftChange({ link: event.target.value })
-              }
+              value={link}
+              onChange={(event) => setLink(event.target.value)}
               placeholder="https://company.com/jobs/..."
             />
           </label>
@@ -79,7 +89,7 @@ function Application({
             <button
               className="button button-secondary"
               type="button"
-              onClick={onCancelEditing}
+              onClick={() => setIsEditing(false)}
             >
               {copy.cancelEdit}
             </button>
@@ -96,9 +106,7 @@ function Application({
               </a>
             )}
           </div>
-          <span
-            className={`status-text ${isClosed ? 'status-closed' : 'status-active'}`}
-          >
+          <span className={isClosed ? 'status-text status-closed' : 'status-text status-active'}>
             {isClosed
               ? copy.outcomes[application.outcome]
               : copy.stages[application.stage]}
@@ -106,21 +114,15 @@ function Application({
         </div>
       )}
 
-      <ol
-        className="progress-tracker"
-        aria-label={`${copy.progressLabel}: ${copy.stages[application.stage] || application.stage}`}
-      >
+      <ol className="progress-tracker">
         {APPLICATION_STAGES.map((stage, index) => {
-          const isComplete = isClosed || index < currentStageIndex
-          const isCurrent = !isClosed && index === currentStageIndex
+          let stepClass = `progress-step stage-${index + 1}`
+          if (isClosed || index < stageIndex) stepClass += ' is-complete'
+          if (!isClosed && index === stageIndex) stepClass += ' is-current'
 
           return (
-            <li
-              className={`progress-step stage-${index + 1}${isComplete ? ' is-complete' : ''}${isCurrent ? ' is-current' : ''}`}
-              key={stage}
-              aria-current={isCurrent ? 'step' : undefined}
-            >
-              <span className="progress-marker" aria-hidden="true" />
+            <li className={stepClass} key={stage}>
+              <span className="progress-marker" />
               <span className="progress-label">{copy.stages[stage]}</span>
             </li>
           )
@@ -163,11 +165,9 @@ function Application({
 
       <div className="activity-section">
         <button
-          className="history-toggle"
+          className={showHistory ? 'history-toggle is-open' : 'history-toggle'}
           type="button"
-          aria-expanded={historyOpen}
-          aria-label={historyOpen ? copy.hideHistory : copy.showHistory}
-          onClick={() => onToggleHistory(application.id)}
+          onClick={() => setShowHistory(!showHistory)}
         >
           <span className="activity-heading">
             <strong>{copy.activityHistory}</strong>
@@ -176,9 +176,10 @@ function Application({
               {application.activities.length === 1 ? copy.update : copy.updates}
             </span>
           </span>
-          <span className="history-arrow" aria-hidden="true" />
+          <span className="history-arrow" />
         </button>
-        {historyOpen && (
+
+        {showHistory && (
           <div className="activity-body">
             {application.activities.length === 0 ? (
               <p className="no-activity">{copy.noActivity}</p>
@@ -186,102 +187,20 @@ function Application({
               <ul className="activity-list">
                 {application.activities.map((activity) => (
                   <li className="activity-item" key={activity.id}>
-                    <span className="activity-dot" aria-hidden="true" />
+                    <span className="activity-dot" />
                     <div className="activity-entry">
                       {editingActivityId === activity.id ? (
-                        <form
-                          className="activity-edit-form"
-                          onSubmit={(event) =>
-                            onSaveActivityEdits(
-                              event,
-                              application.id,
-                              activity.id
-                            )
-                          }
-                        >
-                          <label>
-                            {copy.activityType}
-                            <select
-                              name="type"
-                              value={activityDraft.type}
-                              onChange={(event) =>
-                                onActivityDraftChange({
-                                  type: event.target.value,
-                                })
-                              }
-                              required
-                            >
-                              {ACTIVITY_TYPES.map((type) => (
-                                <option key={type} value={type}>
-                                  {copy.activityTypes[type]}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label>
-                            {copy.date}
-                            <input
-                              name="date"
-                              type="date"
-                              value={activityDraft.date}
-                              onChange={(event) =>
-                                onActivityDraftChange({
-                                  date: event.target.value,
-                                })
-                              }
-                              required
-                            />
-                          </label>
-                          <label className="activity-edit-notes">
-                            {copy.notes}
-                            <input
-                              name="notes"
-                              value={activityDraft.notes}
-                              onChange={(event) =>
-                                onActivityDraftChange({
-                                  notes: event.target.value,
-                                })
-                              }
-                              required
-                            />
-                          </label>
-                          <label>
-                            {copy.followUp}{' '}
-                            <span className="optional-label">
-                              {copy.optional}
-                            </span>
-                            <input
-                              name="followUpDate"
-                              type="date"
-                              value={activityDraft.followUpDate}
-                              onChange={(event) =>
-                                onActivityDraftChange({
-                                  followUpDate: event.target.value,
-                                })
-                              }
-                            />
-                          </label>
-                          <div className="activity-edit-actions">
-                            <button
-                              className="button button-primary"
-                              type="submit"
-                            >
-                              {copy.saveChanges}
-                            </button>
-                            <button
-                              className="button button-secondary"
-                              type="button"
-                              onClick={onCancelEditingActivity}
-                            >
-                              {copy.cancelEdit}
-                            </button>
-                          </div>
-                        </form>
+                        <ActivityForm
+                          copy={copy}
+                          activity={activity}
+                          onSave={(changes) => saveActivity(activity.id, changes)}
+                          onCancel={() => setEditingActivityId(null)}
+                        />
                       ) : (
                         <>
                           <p className="activity-meta">
-                            {copy.activityTypes[activity.type] || activity.type}{' '}
-                            <span>·</span> {activity.date}
+                            {copy.activityTypes[activity.type]} <span>·</span>{' '}
+                            {activity.date}
                           </p>
                           <p className="activity-notes">{activity.notes}</p>
                           {activity.followUpDate && (
@@ -292,7 +211,7 @@ function Application({
                           <button
                             className="edit-button activity-edit-trigger"
                             type="button"
-                            onClick={() => onStartEditingActivity(activity)}
+                            onClick={() => setEditingActivityId(activity.id)}
                           >
                             {copy.editUpdate}
                           </button>
@@ -304,80 +223,55 @@ function Application({
               </ul>
             )}
 
-            <form
-              className="activity-form"
-              onSubmit={(event) => onAddActivity(application.id, event)}
-            >
-              <label>
-                {copy.activityType}
-                <select name="type" defaultValue="" required>
-                  <option value="" disabled>
-                    {copy.selectType}
-                  </option>
-                  {ACTIVITY_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {copy.activityTypes[type]}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                {copy.date}
-                <input type="date" name="date" required />
-              </label>
-              <label className="activity-notes-field">
-                {copy.notes}
-                <input
-                  type="text"
-                  name="notes"
-                  placeholder={copy.notesPlaceholder}
-                  required
-                />
-              </label>
-              <label>
-                {copy.followUp}{' '}
-                <span className="optional-label">{copy.optional}</span>
-                <input type="date" name="followUpDate" />
-              </label>
-              <button className="button button-secondary" type="submit">
-                {copy.addUpdate}
-              </button>
-            </form>
+            <ActivityForm copy={copy} onSave={addActivity} />
           </div>
         )}
       </div>
 
       <div className="card-footer">
-        <div className="card-actions">
-          {editingId !== application.id && (
+        {confirmDelete ? (
+          <div className="delete-confirm">
+            <p>{copy.deleteConfirm}</p>
             <button
-              className="edit-button"
+              className="button button-secondary"
               type="button"
-              onClick={() => onStartEditing(application)}
+              onClick={() => setConfirmDelete(false)}
             >
-              {copy.editApplication}
+              {copy.cancelEdit}
             </button>
-          )}
-          <button
-            className="icon-action"
-            type="button"
-            aria-pressed={isClosed}
-            aria-label={isClosed ? copy.reopenApplication : copy.markClosed}
-            title={isClosed ? copy.reopenApplication : copy.markClosed}
-            onClick={() => onToggleClosed(application)}
-          >
-            <CheckIcon />
-          </button>
-          <button
-            className="icon-action icon-action-danger"
-            type="button"
-            aria-label={copy.deleteApplication}
-            title={copy.deleteApplication}
-            onClick={() => onDelete(application.id)}
-          >
-            <TrashIcon />
-          </button>
-        </div>
+            <button
+              className="button button-primary delete-confirm-button"
+              type="button"
+              onClick={() => onDelete(application.id)}
+            >
+              {copy.confirmDelete}
+            </button>
+          </div>
+        ) : (
+          <div className="card-actions">
+            {!isEditing && (
+              <button className="edit-button" type="button" onClick={startEditing}>
+                {copy.editApplication}
+              </button>
+            )}
+            <button
+              className={isClosed ? 'icon-action is-active' : 'icon-action'}
+              type="button"
+              title={isClosed ? copy.reopenApplication : copy.markClosed}
+              onClick={toggleClosed}
+            >
+              <CheckIcon />
+            </button>
+            <button
+              className="icon-action icon-action-danger"
+              type="button"
+              title={copy.deleteApplication}
+              onClick={() => setConfirmDelete(true)}
+            >
+              <TrashIcon />
+            </button>
+          </div>
+        )}
       </div>
     </article>
   )

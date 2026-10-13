@@ -1,27 +1,30 @@
+import { useState } from 'react'
 import { PlusIcon } from './Icons.jsx'
 
-function ApplicationForm({
-  copy,
-  company,
-  role,
-  link,
-  onCompanyChange,
-  onRoleChange,
-  onLinkChange,
-  onSubmit,
-}) {
+function ApplicationForm({ copy, onAdd }) {
+  const [company, setCompany] = useState('')
+  const [role, setRole] = useState('')
+  const [link, setLink] = useState('')
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    onAdd({ company, role, link })
+    setCompany('')
+    setRole('')
+    setLink('')
+  }
+
   return (
-    <section className="panel new-application-panel">
+    <section className="panel">
       <div className="section-heading">
         <h2>{copy.newApplication}</h2>
       </div>
-      <form className="application-form" onSubmit={onSubmit}>
+      <form className="application-form" onSubmit={handleSubmit}>
         <label>
           {copy.company}
           <input
-            id="company"
             value={company}
-            onChange={onCompanyChange}
+            onChange={(event) => setCompany(event.target.value)}
             placeholder={copy.companyPlaceholder}
             required
           />
@@ -29,9 +32,8 @@ function ApplicationForm({
         <label>
           {copy.role}
           <input
-            id="role"
             value={role}
-            onChange={onRoleChange}
+            onChange={(event) => setRole(event.target.value)}
             placeholder={copy.rolePlaceholder}
             required
           />
@@ -40,10 +42,9 @@ function ApplicationForm({
           {copy.applicationLink}{' '}
           <span className="optional-label">{copy.optional}</span>
           <input
-            id="link"
             type="url"
             value={link}
-            onChange={onLinkChange}
+            onChange={(event) => setLink(event.target.value)}
             placeholder="https://company.com/jobs/..."
           />
         </label>

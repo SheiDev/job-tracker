@@ -6,20 +6,18 @@
   width: min(800px, calc(100% - 32px));
   margin: 40px auto 64px;
   padding: 48px 52px 60px;
-  border: 1px solid rgb(44 36 28 / 12%);
+  border: 1px solid var(--line);
   background: var(--paper);
-  box-shadow:
-    8px 8px 0 var(--desk),
-    8px 8px 0 1px rgb(44 36 28 / 14%);
+  box-shadow: 8px 8px 0 var(--shadow);
 }
 
 .topbar {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px 24px;
-  padding: 0 0 26px;
-  border-bottom: 1px solid var(--line);
+  padding: 0 0 22px;
+  border-bottom: 2px solid var(--ink);
 }
 
 .brand {
@@ -40,9 +38,9 @@
 .topbar h1::after {
   display: block;
   width: 40px;
-  height: 2px;
+  height: 3px;
   margin-top: 14px;
-  background: var(--mark);
+  background: var(--gold);
   content: '';
 }
 
@@ -50,7 +48,7 @@
   margin: 8px 0 0;
   color: var(--muted);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   letter-spacing: 0.02em;
 }
 
@@ -59,34 +57,43 @@
   flex: 1;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0;
+  gap: 36px;
   margin: 0;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.stat-line span + span::before {
-  margin: 0 10px;
-  color: var(--soft);
-  content: '·';
+.stat-line span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
 .stat-line strong {
-  margin-right: 4px;
   color: var(--ink);
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.92rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.4rem;
+  font-style: italic;
   font-weight: 500;
+  font-variant-numeric: lining-nums;
+  line-height: 1;
 }
 
 .utility-toggles {
   display: flex;
   flex: 0 0 auto;
-  align-items: baseline;
-  gap: 12px;
+  align-self: flex-start;
+  align-items: center;
+  gap: 14px;
 }
 
 .text-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -102,11 +109,16 @@
   color: var(--ink);
 }
 
-.stat-active {
-  color: var(--stage-3);
+.text-toggle svg {
+  width: 17px;
+  height: 17px;
 }
 
-.stat-interviews {
+.stat-line .stat-active {
+  color: var(--accent);
+}
+
+.stat-line .stat-interviews {
   color: var(--mark);
 }
 
@@ -149,7 +161,7 @@
   gap: 6px;
   color: var(--muted);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 500;
   letter-spacing: 0.03em;
 }
@@ -223,11 +235,11 @@ textarea:focus {
 .button-primary {
   padding: 0 18px;
   background: var(--mark);
-  color: #fff;
+  color: var(--on-mark);
 }
 
 .button-primary:hover {
-  background: #a8682e;
+  background: var(--mark-hover);
 }
 
 .submit-button {
@@ -262,33 +274,6 @@ textarea:focus {
   opacity: 0.5;
 }
 
-.import-button {
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.import-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-}
-
-.import-button:focus-within {
-  outline: 2px solid var(--mark);
-  outline-offset: 3px;
-}
-
-.import-status {
-  margin: 0 0 12px;
-  color: var(--muted);
-  font-size: 0.76rem;
-}
-
 .applications-heading h2 {
   display: flex;
   align-items: center;
@@ -319,41 +304,56 @@ textarea:focus {
 
 .application-list {
   display: grid;
-  gap: 22px;
+  gap: 20px;
   min-width: 0;
 }
 
 .application-card {
+  --card-color: var(--stage-1);
   min-width: 0;
-  padding: 20px 0 8px 16px;
-  border: 0;
-  border-top: 1px solid var(--line);
-  border-left: 2px solid var(--stage-1);
-  background: transparent;
+  padding: 18px 20px 10px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--card-color);
+  background: var(--card);
+  box-shadow: 4px 4px 0 var(--line);
 }
 
 .application-card.stage-2 {
-  border-left-color: var(--stage-2);
+  --card-color: var(--stage-2);
 }
 
 .application-card.stage-3 {
-  border-left-color: var(--stage-3);
+  --card-color: var(--stage-3);
 }
 
 .application-card.stage-4 {
-  border-left-color: var(--stage-4);
+  --card-color: var(--stage-4);
 }
 
 .application-card.stage-5 {
-  border-left-color: var(--stage-5);
+  --card-color: var(--stage-5);
 }
 
 .application-card.stage-6 {
-  border-left-color: var(--stage-6);
+  --card-color: var(--stage-6);
 }
 
-.application-card.is-closed {
-  opacity: 0.78;
+.application-card.outcome-offer {
+  --card-color: var(--success);
+}
+
+.application-card.outcome-rejected {
+  --card-color: var(--danger);
+}
+
+.application-card.outcome-withdrawn {
+  --card-color: var(--muted);
+}
+
+.application-card.is-closed .application-title,
+.application-card.is-closed .progress-tracker,
+.application-card.is-closed .application-controls {
+  opacity: 0.75;
 }
 
 .application-card.is-closed .application-title h3 {
@@ -409,10 +409,10 @@ textarea:focus {
 
 .progress-step::before {
   position: absolute;
-  top: 5px;
+  top: 6px;
   right: 50%;
-  left: calc(-50% + 5px);
-  height: 1px;
+  left: calc(-50% + 6px);
+  height: 2px;
   background: var(--line);
   content: '';
 }
@@ -429,11 +429,11 @@ textarea:focus {
 .progress-marker {
   position: relative;
   z-index: 1;
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
   flex: 0 0 auto;
-  border: 1px solid var(--soft);
-  background: var(--paper);
+  border: 1.5px solid var(--soft);
+  background: var(--card);
 }
 
 .progress-step.is-complete .progress-marker {
@@ -442,15 +442,16 @@ textarea:focus {
 }
 
 .progress-step.is-current .progress-marker {
-  width: 13px;
-  height: 13px;
   border-color: var(--mark);
   background: var(--mark);
+  box-shadow:
+    0 0 0 3px var(--card),
+    0 0 0 4.5px var(--mark);
 }
 
 .progress-label {
   max-width: 100%;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 400;
   line-height: 1.35;
 }
@@ -466,7 +467,7 @@ textarea:focus {
 
 .application-card-heading {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   gap: 12px;
 }
 
@@ -485,7 +486,7 @@ textarea:focus {
   gap: 6px;
   color: var(--muted);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 500;
   letter-spacing: 0.03em;
 }
@@ -515,7 +516,7 @@ textarea:focus {
 }
 
 .icon-action:hover,
-.icon-action[aria-pressed='true'] {
+.icon-action.is-active {
   border-color: var(--mark);
   color: var(--mark);
 }
@@ -542,23 +543,23 @@ textarea:focus {
 .application-title p {
   color: var(--muted);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
 .application-title h3 {
   margin-top: 4px;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.65rem;
+  font-size: 1.8rem;
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.025em;
 }
 
 .application-title a {
   display: inline-block;
   margin-top: 4px;
-  color: var(--accent);
-  font-size: 0.74rem;
+  color: var(--link);
+  font-size: 0.78rem;
   text-decoration: none;
 }
 
@@ -567,21 +568,25 @@ textarea:focus {
 }
 
 .status-text {
-  max-width: 180px;
+  max-width: 200px;
   overflow: hidden;
+  padding: 4px 9px;
+  border: 1.5px solid var(--card-color);
+  color: var(--card-color);
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-overflow: ellipsis;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-.status-active {
-  color: var(--stage-4);
-}
-
 .status-closed {
-  color: var(--muted);
+  padding: 5px 11px;
+  border-width: 2px;
+  font-size: 0.78rem;
+  transform: rotate(-7deg);
 }
 
 .application-controls {
@@ -639,7 +644,7 @@ textarea:focus {
   transform: rotate(45deg);
 }
 
-.history-toggle[aria-expanded='true'] .history-arrow {
+.history-toggle.is-open .history-arrow {
   transform: translateY(3px) rotate(-135deg);
 }
 
@@ -703,23 +708,23 @@ textarea:focus {
 }
 
 .activity-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   flex: 0 0 auto;
   margin-top: 6px;
-  background: var(--mark);
+  background: var(--gold);
 }
 
 .activity-meta,
 .activity-notes,
 .follow-up {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
 }
 
 .activity-meta {
   font-family: 'IBM Plex Mono', ui-monospace, monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 500;
 }
 
@@ -737,7 +742,7 @@ textarea:focus {
 .follow-up {
   margin-top: 3px;
   color: var(--mark);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
 }
 
 .activity-form {
@@ -751,13 +756,13 @@ textarea:focus {
 }
 
 .activity-form label {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
 }
 
 .activity-form input,
 .activity-form select {
   min-height: 34px;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
 }
 
 .button-secondary {
@@ -781,29 +786,39 @@ textarea:focus {
   padding: 8px 0 4px;
 }
 
-.delete-button {
-  border: 0;
-  background: transparent;
-  color: var(--danger);
-  cursor: pointer;
-  font: inherit;
+.delete-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.delete-confirm p {
+  margin: 0;
+  flex: 1;
+  min-width: 12rem;
+  color: var(--muted);
   font-size: 0.72rem;
+}
+
+.delete-confirm-button {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--paper);
 }
 
 .edit-button {
   border: 0;
   background: transparent;
-  color: var(--accent);
+  color: var(--link);
   cursor: pointer;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
 .edit-button:hover {
-  text-decoration: underline;
-}
-
-.delete-button:hover {
   text-decoration: underline;
 }
 
@@ -851,6 +866,10 @@ textarea:focus {
     justify-content: flex-start;
     order: 3;
     width: 100%;
+  }
+
+  .stat-line span {
+    align-items: flex-start;
   }
 
   .application-form {

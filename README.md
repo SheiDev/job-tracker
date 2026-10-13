@@ -2,9 +2,15 @@
 
 Slate es una aplicación web para organizar y dar seguimiento a postulaciones de empleo. Permite registrar ofertas, revisar su avance y guardar notas de cada contacto.
 
+Proyecto final (TPF) del curso de Ada.
+
+## Demo
+
+Próximamente en Vercel.
+
 ## Funciones
 
-- Crear, editar y eliminar postulaciones.
+- Crear, editar y eliminar postulaciones, con confirmación antes de borrar.
 - Seguir seis etapas del proceso y registrar el resultado.
 - Añadir y editar actividades, fechas, notas y seguimientos.
 - Filtrar postulaciones activas y cerradas.
@@ -46,6 +52,29 @@ pnpm lint     # Revisa el código con ESLint
 ## Almacenamiento
 
 Las postulaciones se guardan en el navegador y dispositivo donde se usa Slate. No se sincronizan automáticamente con otros dispositivos. Para conservar una copia externa, descarga el archivo CSV desde la aplicación.
+
+## Estructura
+
+```text
+src/
+├── main.jsx                    # Punto de entrada de React
+├── App.jsx                     # Estado principal, tema e idioma
+├── i18n.js                     # Textos en inglés y español
+├── index.css                   # Colores de cada tema y fondo cuadriculado
+├── App.css                     # Estilos de la aplicación
+└── components/
+    ├── ApplicationForm.jsx     # Formulario para agregar postulaciones
+    ├── ApplicationList.jsx     # Lista, filtro y descarga CSV
+    ├── Application.jsx         # Tarjeta de cada postulación
+    ├── ActivityForm.jsx        # Formulario para agregar o editar actividades
+    └── Icons.jsx               # Iconos SVG
+```
+
+## Diseño
+
+- Estilo de papelería: tarjetas sin bordes redondeados, sombras sólidas y fondo de hoja cuadriculada.
+- Paleta ciruela y rosa empolvado, con versión clara y oscura.
+- Tipografías: Cormorant Garamond para títulos y cifras, IBM Plex Mono para el resto del texto.
 
 ## Tecnologías
 
