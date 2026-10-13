@@ -6,7 +6,7 @@ Proyecto final (TPF) del curso de Ada.
 
 ## Demo
 
-Próximamente en Vercel.
+Versión publicada en Vercel: [job-tracker-opal-nine.vercel.app](https://job-tracker-opal-nine.vercel.app/)
 
 ## Funciones
 
