@@ -1,0 +1,248 @@
+{
+  "info": {
+    "name": "Slate API",
+    "description": "Colección para probar la API de Slate. Ejecuta las peticiones en orden: el registro guarda el token y las creaciones guardan los ids.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "email", "value": "" },
+    { "key": "applicationId", "value": "" },
+    { "key": "activityId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Registrar",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.collectionVariables.set('email', `slate.${Date.now()}@example.com`)"]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('crea la cuenta', () => pm.response.to.have.status(201))",
+              "const body = pm.response.json()",
+              "pm.collectionVariables.set('token', body.token)",
+              "pm.collectionVariables.set('userId', body.user.id)"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sheila\",\n  \"email\": \"{{email}}\",\n  \"password\": \"clave-segura-1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/register"
+      }
+    },
+    {
+      "name": "Login inválido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('rechaza la contraseña', () => pm.response.to.have.status(401))"]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"incorrecta\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('inicia sesión', () => pm.response.to.have.status(200))",
+              "const body = pm.response.json()",
+              "pm.collectionVariables.set('token', body.token)"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"clave-segura-1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Perfil",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/auth/me" }
+    },
+    {
+      "name": "Listar usuarios",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/users" }
+    },
+    {
+      "name": "Postulación inválida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('rechaza datos vacíos', () => pm.response.to.have.status(400))"]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{}" },
+        "url": "{{baseUrl}}/api/applications"
+      }
+    },
+    {
+      "name": "Crear postulación",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('crea la postulación', () => pm.response.to.have.status(201))",
+              "pm.collectionVariables.set('applicationId', pm.response.json().id)"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"company\": \"Northstar Studio\",\n  \"role\": \"Junior designer\",\n  \"link\": \"https://example.com/jobs/1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/applications"
+      }
+    },
+    {
+      "name": "Listar postulaciones",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/applications" }
+    },
+    {
+      "name": "Ver postulación",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/applications/{{applicationId}}" }
+    },
+    {
+      "name": "Actualizar postulación",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"stage\": \"Contact started\"\n}" },
+        "url": "{{baseUrl}}/api/applications/{{applicationId}}"
+      }
+    },
+    {
+      "name": "Crear actividad",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('crea la actividad', () => pm.response.to.have.status(201))",
+              "pm.collectionVariables.set('activityId', pm.response.json().id)"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Email\",\n  \"date\": \"2026-10-24\",\n  \"notes\": \"Envié el portafolio\",\n  \"followUpDate\": \"2026-10-31\"\n}"
+        },
+        "url": "{{baseUrl}}/api/applications/{{applicationId}}/activities"
+      }
+    },
+    {
+      "name": "Listar actividades",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/activities" }
+    },
+    {
+      "name": "Ver actividad",
+      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/activities/{{activityId}}" }
+    },
+    {
+      "name": "Actualizar actividad",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Call\",\n  \"date\": \"2026-10-24\",\n  \"notes\": \"Llamada con el equipo\"\n}"
+        },
+        "url": "{{baseUrl}}/api/activities/{{activityId}}"
+      }
+    },
+    {
+      "name": "Borrar id inexistente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('no encuentra el registro', () => pm.response.to.have.status(404))"]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/applications/000000000000000000000000"
+      }
+    },
+    {
+      "name": "Borrar actividad",
+      "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/activities/{{activityId}}" }
+    },
+    {
+      "name": "Borrar postulación",
+      "request": { "method": "DELETE", "header": [], "url": "{{baseUrl}}/api/applications/{{applicationId}}" }
+    }
+  ]
+}
