@@ -86,6 +86,25 @@ src/
 
 El backend vive en `server/` y está escrito en TypeScript. Expone una API REST para usuarios, postulaciones y actividades. Cada persona solo ve sus propias postulaciones. Las contraseñas se guardan con bcrypt y el acceso usa un token JWT.
 
+API desplegada: [https://job-tracker-zn79.onrender.com](https://job-tracker-zn79.onrender.com)
+
+Comprobación: [https://job-tracker-zn79.onrender.com/api/health](https://job-tracker-zn79.onrender.com/api/health)
+
+### Arquitectura
+
+El sitio de Slate sigue publicado en Vercel y guarda las postulaciones en el navegador. La API es otro servicio: Postman la llama por HTTPS, Render ejecuta Express y MongoDB Atlas guarda los datos.
+
+```mermaid
+flowchart LR
+  postman[Postman]
+  vercel[Slate en Vercel]
+  api[API Express en Render]
+  db[(MongoDB Atlas)]
+
+  postman -->|REST y JWT| api
+  api --> db
+```
+
 ### Ejecutar la API
 
 Hace falta MongoDB en local (el puerto 27017). Copia las variables de entorno y arranca el servidor:
@@ -140,6 +159,6 @@ Las rutas, salvo el health check y el registro, piden `Authorization: Bearer <to
 | PUT | `/api/activities/:id` | Actualiza una actividad propia. |
 | DELETE | `/api/activities/:id` | Borra una actividad propia. |
 
-Los errores usan `{ "message", "code" }`. Los códigos son `VALIDATION`, `INVALID_CREDENTIALS`, `EMAIL_TAKEN`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND` y `RATE_LIMIT`.
+Los errores usan `{ "message", "code" }`. Los códigos son `VALIDATION`, `INVALID_CREDENTIALS`, `EMAIL_TAKEN`, `CONFLICT`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND` y `RATE_LIMIT`.
 
 La colección de Postman está en [postman/Slate.postman_collection.json](postman/Slate.postman_collection.json).
