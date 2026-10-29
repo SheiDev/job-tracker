@@ -16,7 +16,7 @@ Versión publicada en Vercel: [job-tracker-opal-nine.vercel.app](https://job-tra
 - Filtrar postulaciones activas y cerradas.
 - Cambiar el idioma entre español e inglés y alternar el modo claro y oscuro.
 - Adaptar los formularios y la vista a pantallas móviles y de escritorio.
-- Guardar los datos en el almacenamiento local del navegador.
+- Crear una cuenta, iniciar sesión y guardar las postulaciones en la API.
 - Descargar las postulaciones y sus actividades como archivo CSV compatible con hojas de cálculo.
 
 ## Requisitos
@@ -51,7 +51,7 @@ pnpm lint     # Revisa el código con ESLint
 
 ## Almacenamiento
 
-Las postulaciones se guardan en el navegador y dispositivo donde se usa Slate. No se sincronizan automáticamente con otros dispositivos. Para conservar una copia externa, descarga el archivo CSV desde la aplicación.
+Con la sesión iniciada, las postulaciones y las actividades se guardan en la API. Cada cuenta ve solo las suyas. El tema y el idioma siguen guardados en el navegador. Para conservar una copia externa, descarga el archivo CSV desde la aplicación.
 
 ## Estructura
 
@@ -92,15 +92,16 @@ Comprobación: [https://job-tracker-zn79.onrender.com/api/health](https://job-tr
 
 ### Arquitectura
 
-El sitio de Slate sigue publicado en Vercel y guarda las postulaciones en el navegador. La API es otro servicio: Postman la llama por HTTPS, Render ejecuta Express y MongoDB Atlas guarda los datos.
+Slate, publicado en Vercel, inicia sesión contra la API y guarda las postulaciones ahí. Postman puede llamar la misma API. Render ejecuta Express y MongoDB Atlas guarda los datos. La página no muestra el token: lo guarda y lo envía en las peticiones.
 
 ```mermaid
 flowchart LR
-  postman[Postman]
   vercel[Slate en Vercel]
+  postman[Postman]
   api[API Express en Render]
   db[(MongoDB Atlas)]
 
+  vercel -->|REST y JWT| api
   postman -->|REST y JWT| api
   api --> db
 ```

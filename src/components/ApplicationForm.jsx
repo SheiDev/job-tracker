@@ -6,12 +6,16 @@ function ApplicationForm({ copy, onAdd }) {
   const [role, setRole] = useState('')
   const [link, setLink] = useState('')
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    onAdd({ company, role, link })
-    setCompany('')
-    setRole('')
-    setLink('')
+    try {
+      await onAdd({ company, role, link })
+      setCompany('')
+      setRole('')
+      setLink('')
+    } catch {
+      // El mensaje queda en el aviso de la página.
+    }
   }
 
   return (

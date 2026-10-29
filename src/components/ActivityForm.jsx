@@ -10,9 +10,13 @@ function ActivityForm({ copy, activity, onSave, onCancel }) {
     activity ? activity.followUpDate : ''
   )
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    onSave({ type, date, notes, followUpDate })
+    try {
+      await onSave({ type, date, notes, followUpDate })
+    } catch {
+      return
+    }
 
     if (!isEditing) {
       setType('')

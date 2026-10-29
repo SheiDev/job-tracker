@@ -3,7 +3,14 @@ import { APPLICATION_STAGES, OUTCOMES } from '../i18n.js'
 import ActivityForm from './ActivityForm.jsx'
 import { CheckIcon, TrashIcon } from './Icons.jsx'
 
-function Application({ application, copy, onUpdate, onDelete }) {
+function Application({
+  application,
+  copy,
+  onUpdate,
+  onDelete,
+  onAddActivity,
+  onUpdateActivity,
+}) {
   const [isEditing, setIsEditing] = useState(false)
   const [company, setCompany] = useState(application.company)
   const [role, setRole] = useState(application.role)
@@ -27,29 +34,31 @@ function Application({ application, copy, onUpdate, onDelete }) {
     setIsEditing(true)
   }
 
-  function saveEdits(event) {
+  async function saveEdits(event) {
     event.preventDefault()
-    onUpdate(application.id, { company, role, link })
-    setIsEditing(false)
+    try {
+      await onUpdate(application.id, { company, role, link })
+      setIsEditing(false)
+    } catch {
+      // El mensaje queda en el aviso de la página.
+    }
   }
 
   function toggleClosed() {
     onUpdate(application.id, { outcome: isClosed ? null : 'Rejected' })
   }
 
-  function addActivity(activity) {
-    onUpdate(application.id, {
-      activities: [{ ...activity, id: Date.now() }, ...application.activities],
-    })
+  async function addActivity(activity) {
+    await onAddActivity(application.id, activity)
   }
 
-  function saveActivity(id, changes) {
-    onUpdate(application.id, {
-      activities: application.activities.map((activity) =>
-        activity.id === id ? { ...activity, ...changes } : activity
-      ),
-    })
-    setEditingActivityId(null)
+  async function saveActivity(id, changes) {
+    try {
+      await onUpdateActivity(id, changes)
+      setEditingActivityId(null)
+    } catch {
+      // El mensaje queda en el aviso de la página.
+    }
   }
 
   return (

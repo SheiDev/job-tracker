@@ -2,7 +2,14 @@ import { useState } from 'react'
 import Application from './Application.jsx'
 import { FilterIcon } from './Icons.jsx'
 
-function ApplicationList({ copy, applications, onUpdate, onDelete }) {
+function ApplicationList({
+  copy,
+  applications,
+  onUpdate,
+  onDelete,
+  onAddActivity,
+  onUpdateActivity,
+}) {
   const [filter, setFilter] = useState('all')
 
   const visibleApplications = applications.filter((application) => {
@@ -114,6 +121,8 @@ function ApplicationList({ copy, applications, onUpdate, onDelete }) {
               copy={copy}
               onUpdate={onUpdate}
               onDelete={onDelete}
+              onAddActivity={onAddActivity}
+              onUpdateActivity={onUpdateActivity}
             />
           ))}
         </div>
