@@ -148,6 +148,47 @@
   letter-spacing: 0.03em;
 }
 
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 28px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.password-toggle:hover {
+  color: var(--ink);
+}
+
+.password-rules {
+  margin: -6px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--danger);
+  font-size: 0.72rem;
+}
+
+.password-rules li + li {
+  margin-top: 4px;
+}
+
 .auth-switch {
   margin-top: 18px;
 }

@@ -9,15 +9,27 @@ function optionalOutcome(value: unknown) {
   return value === '' || value === null || (typeof value === 'string' && OUTCOMES.includes(value as (typeof OUTCOMES)[number]))
 }
 
+function strongPassword(value: unknown) {
+  return (
+    typeof value === 'string' &&
+    value.length >= 8 &&
+    value.length <= 72 &&
+    /[A-Z]/.test(value) &&
+    /\d/.test(value) &&
+    /[^A-Za-z0-9]/.test(value)
+  )
+}
+
+const passwordMessage =
+  'La contraseña necesita al menos 8 caracteres, una mayúscula, un número y un signo.'
+
 export const registerRules: ValidationChain[] = [
   body('name')
     .trim()
     .isLength({ min: 2, max: 80 })
     .withMessage('El nombre tiene que tener entre 2 y 80 caracteres.'),
   body('email').trim().toLowerCase().isEmail().withMessage('Ingresa un email válido.'),
-  body('password')
-    .isLength({ min: 8, max: 72 })
-    .withMessage('La contraseña tiene que tener al menos 8 caracteres.'),
+  body('password').custom(strongPassword).withMessage(passwordMessage),
 ]
 
 export const loginRules: ValidationChain[] = [
@@ -32,10 +44,7 @@ export const updateUserRules: ValidationChain[] = [
     .isLength({ min: 2, max: 80 })
     .withMessage('El nombre tiene que tener entre 2 y 80 caracteres.'),
   body('email').optional().trim().toLowerCase().isEmail().withMessage('Ingresa un email válido.'),
-  body('password')
-    .optional()
-    .isLength({ min: 8, max: 72 })
-    .withMessage('La contraseña tiene que tener al menos 8 caracteres.'),
+  body('password').optional().custom(strongPassword).withMessage(passwordMessage),
   body().custom((_value, { req }) => {
     const body = req.body as { name?: unknown; email?: unknown; password?: unknown }
     if (body.name === undefined && body.email === undefined && body.password === undefined) {
